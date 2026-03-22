@@ -1,0 +1,753 @@
+/* ═══════════════════════════════════════════════════════════
+   CHIPS 2026 — Pixel CRT / handheld aesthetic (chocolate void +
+   electric blue + arcade gold + hard red shadows — no blue bloom)
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --retro-void: #120a07;
+  --retro-bg: #160d08;
+  --retro-hud: #1a100c;
+  --retro-panel: #1f140f;
+  --retro-panel2: #24180f;
+  --retro-border: #3d2418;
+  /* Electric “TV bezel” blue — crisp accents only */
+  --retro-electric: #00aeef;
+  --retro-electric-mid: #0088c6;
+  --retro-electric-dim: #0a4a62;
+  --retro-cyan: var(--retro-electric);
+  --retro-cyan-mid: var(--retro-electric-mid);
+  --retro-cyan-dim: var(--retro-electric-dim);
+  --retro-gold: #ffd700;
+  --retro-gold-hot: #ffe566;
+  --retro-gold-dim: #8a6a00;
+  --retro-red: #c41e2a;
+  --retro-red-deep: #7f1018;
+  --retro-text: #f5ebe0;
+  --retro-text-dim: #a89888;
+  --pixel-shadow: 4px 4px 0 #0a0604;
+  --pixel-shadow-deep: 4px 4px 0 #0a0604, 8px 8px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Base & accessibility */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  z-index: 200;
+  padding: 0.65rem 1rem;
+  border: 3px solid var(--retro-gold);
+  background: var(--retro-cyan);
+  color: var(--retro-void);
+  font-family: 'VT323', monospace;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: var(--pixel-shadow);
+}
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+  outline: 3px solid var(--retro-gold);
+  outline-offset: 4px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .flip-inner {
+    transition: none !important;
+  }
+  .reveal,
+  .section-fade .section-fade-item {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .retro-crt::before {
+    animation: none !important;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--retro-gold);
+  outline-offset: 3px;
+}
+
+/* ─── Theme: typography & body ─── */
+.retro-theme {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 15px;
+  color: var(--retro-text);
+  background-color: var(--retro-bg);
+  letter-spacing: 0.02em;
+}
+
+.retro-theme .font-display {
+  font-family: 'VT323', monospace !important;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.retro-theme h1.font-display,
+.retro-theme h2.font-display,
+.retro-theme h3.font-display {
+  text-shadow: 2px 2px 0 #0a0604;
+}
+
+/* Background stack — subtle contrast; no extra blue cast */
+.bg-stack {
+  filter: contrast(1.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-stack {
+    filter: none;
+  }
+}
+
+/* CRT + scanlines + warm vignette (no cyan haze) */
+.retro-crt {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  pointer-events: none;
+  background: radial-gradient(ellipse 75% 65% at 50% 42%, transparent 35%, rgba(18, 8, 4, 0.62) 100%);
+}
+
+.retro-crt::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.11) 0px,
+    rgba(0, 0, 0, 0.11) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: 0.32;
+  animation: scan-drift 14s linear infinite;
+}
+
+@keyframes scan-drift {
+  to {
+    transform: translateY(3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .retro-crt::before {
+    animation: none;
+  }
+}
+
+/* Edge darken only — hard CRT bezel feel, zero blue glow */
+.retro-crt::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+/* Noise — chunkier, arcade film grain */
+.noise-overlay {
+  opacity: 0.065;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+/* ─── Header HUD — blue strip like handheld bezel ─── */
+.retro-header {
+  border-bottom: 4px solid var(--retro-electric);
+  background: linear-gradient(180deg, rgba(30, 18, 12, 0.98) 0%, rgba(18, 10, 6, 0.96) 100%);
+  box-shadow: 0 4px 0 #0a0604, 0 8px 28px rgba(0, 0, 0, 0.5);
+}
+
+.retro-header .nav-link {
+  font-family: 'VT323', monospace;
+  font-size: 1.15rem;
+  color: var(--retro-text-dim) !important;
+  text-shadow: 1px 1px 0 #020508;
+  transition:
+    color 0.12s steps(2),
+    transform 0.12s steps(2);
+}
+.retro-header .nav-link:hover {
+  color: var(--retro-gold) !important;
+  transform: translate(-1px, -1px);
+}
+
+.retro-logo {
+  font-family: 'VT323', monospace;
+  font-size: 1.35rem;
+  line-height: 1.1;
+  text-shadow: 2px 2px 0 #020508;
+}
+@media (min-width: 768px) {
+  .retro-logo {
+    font-size: 1.55rem;
+  }
+}
+
+.retro-logo-pixel {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  line-height: 1.6;
+  color: var(--retro-electric);
+  text-shadow: 2px 2px 0 #0a0604;
+}
+
+/* ─── Pixel / arcade buttons ─── */
+.retro-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'VT323', monospace;
+  font-size: 1.35rem;
+  letter-spacing: 0.06em;
+  border: 3px solid #020508;
+  border-radius: 0;
+  box-shadow: var(--pixel-shadow);
+  transition:
+    transform 0.08s steps(2),
+    box-shadow 0.08s steps(2),
+    filter 0.12s;
+}
+.retro-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #020508;
+  filter: brightness(1.05);
+}
+.retro-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #020508;
+}
+
+.retro-btn--gold {
+  background: linear-gradient(180deg, var(--retro-gold-hot) 0%, var(--retro-gold) 55%, var(--retro-gold-dim) 100%);
+  color: var(--retro-void);
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.retro-btn--cyan {
+  background: linear-gradient(180deg, #4dd8f5 0%, var(--retro-electric) 42%, var(--retro-electric-mid) 100%);
+  color: #0a0604;
+  border-color: #0a0604;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.retro-btn--outline {
+  background: var(--retro-hud);
+  color: var(--retro-electric);
+  border: 3px solid var(--retro-electric);
+  box-shadow: var(--pixel-shadow);
+  text-shadow: 2px 2px 0 #0a0604;
+}
+.retro-btn--outline:hover {
+  background: rgba(0, 174, 239, 0.1);
+  color: var(--retro-gold);
+  border-color: var(--retro-gold);
+}
+
+/* ─── Panels & “cartridge” cards ─── */
+.retro-panel {
+  background: linear-gradient(145deg, var(--retro-panel2) 0%, var(--retro-panel) 50%, #100a08 100%);
+  border: 3px solid var(--retro-border);
+  border-radius: 0;
+  box-shadow: var(--pixel-shadow-deep);
+}
+
+.retro-panel--hud {
+  border-color: var(--retro-electric-dim);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 174, 239, 0.12),
+    var(--pixel-shadow-deep);
+}
+
+.retro-panel-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  line-height: 1.8;
+  color: var(--retro-gold);
+  letter-spacing: 0.08em;
+  text-shadow: 1px 1px 0 var(--retro-gold-dim);
+}
+
+/* ─── Hero ─── */
+.retro-hero-badge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.45rem, 1.8vw, 0.58rem);
+  line-height: 1.9;
+  letter-spacing: 0.12em;
+  color: var(--retro-bg);
+  background: var(--retro-gold);
+  border: 3px solid #020508;
+  box-shadow: var(--pixel-shadow);
+  padding: 0.65rem 1rem 0.55rem;
+}
+
+/* Arcade sign: white fill, black outline, hard red offset — no blue glow */
+.retro-hero-title {
+  font-family: 'VT323', monospace;
+  font-size: clamp(2.5rem, 8vw, 4.75rem);
+  line-height: 0.95;
+  color: var(--retro-text);
+  text-shadow:
+    2px 2px 0 #0a0604,
+    4px 4px 0 #0a0604,
+    6px 6px 0 var(--retro-red-deep);
+}
+
+.retro-hero-year {
+  display: block;
+  margin-top: 0.35em;
+  font-size: clamp(3rem, 12vw, 6rem);
+  line-height: 0.9;
+  color: var(--retro-gold);
+  text-shadow:
+    3px 3px 0 #0a0604,
+    6px 6px 0 #0a0604,
+    9px 9px 0 rgba(160, 28, 38, 0.95);
+}
+
+.retro-tagline {
+  font-family: 'VT323', monospace;
+  font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+  color: var(--retro-electric);
+  text-shadow: 2px 2px 0 #0a0604;
+}
+
+/* ─── Countdown “insert coin” strip ─── */
+.retro-countdown-wrap {
+  border: 3px solid var(--retro-electric-dim);
+  background: linear-gradient(180deg, #1a100c 0%, #0e0806 100%);
+  box-shadow:
+    inset 0 0 0 2px rgba(0, 174, 239, 0.1),
+    var(--pixel-shadow);
+}
+
+.retro-countdown-unit {
+  background: #0e0806;
+  border: 2px solid var(--retro-border);
+  border-radius: 0;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.45);
+  font-family: 'VT323', monospace;
+}
+
+.retro-countdown-unit span:first-child {
+  color: var(--retro-electric) !important;
+  text-shadow: 2px 2px 0 #0a0604;
+}
+
+.retro-countdown-unit:nth-child(3) span:first-child,
+.retro-countdown-unit:nth-child(4) span:first-child {
+  color: var(--retro-gold) !important;
+  text-shadow: 2px 2px 0 #0a0604;
+}
+
+/* ─── Section chrome ─── */
+.retro-section {
+  border-color: rgba(61, 36, 24, 0.55) !important;
+}
+
+.retro-section-alt {
+  background: linear-gradient(180deg, rgba(22, 12, 8, 0.55) 0%, transparent 42%),
+    linear-gradient(0deg, rgba(18, 10, 6, 0.35) 0%, transparent 38%);
+}
+
+.retro-heading-accent {
+  color: var(--retro-electric) !important;
+  text-shadow:
+    2px 2px 0 #0a0604,
+    4px 4px 0 rgba(140, 28, 36, 0.9);
+}
+
+.retro-heading-gold {
+  color: var(--retro-gold) !important;
+  text-shadow: 2px 2px 0 var(--retro-gold-dim);
+}
+
+/* Stat blocks — inventory slots */
+.retro-stat-slot {
+  border: 3px solid var(--retro-border);
+  background: linear-gradient(135deg, var(--retro-panel2) 0%, #100a08 100%);
+  border-radius: 0;
+  box-shadow: var(--pixel-shadow);
+  transition:
+    transform 0.1s steps(2),
+    border-color 0.12s;
+}
+.retro-stat-slot:hover {
+  transform: translate(-2px, -2px);
+  border-color: var(--retro-cyan);
+  box-shadow: 6px 6px 0 #020508;
+}
+
+.retro-stat-slot--gold {
+  border-color: var(--retro-gold-dim);
+}
+.retro-stat-slot--gold:hover {
+  border-color: var(--retro-gold);
+}
+
+.retro-stat-icon {
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--retro-border);
+  background: #120a08;
+  font-size: 1.5rem;
+  image-rendering: pixelated;
+}
+
+/* Timeline — level map path */
+.retro-timeline-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 0;
+  border: 2px solid #020508;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.retro-timeline-line {
+  width: 4px;
+  background: repeating-linear-gradient(
+    180deg,
+    var(--retro-cyan) 0px,
+    var(--retro-cyan) 4px,
+    var(--retro-gold-dim) 4px,
+    var(--retro-gold-dim) 8px
+  );
+  border-radius: 0;
+}
+
+.retro-timeline-card {
+  border: 3px solid var(--retro-border) !important;
+  border-radius: 0 !important;
+  background: var(--retro-panel) !important;
+  box-shadow: var(--pixel-shadow);
+  transition:
+    border-color 0.12s,
+    transform 0.1s steps(2);
+}
+.retro-timeline-card:hover {
+  border-color: var(--retro-cyan) !important;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #020508 !important;
+}
+
+/* Prize “loot drops” */
+.retro-prize {
+  border: 3px solid var(--retro-border) !important;
+  border-radius: 0 !important;
+  background: var(--retro-panel) !important;
+  box-shadow: var(--pixel-shadow);
+  transition:
+    transform 0.1s steps(2),
+    box-shadow 0.12s;
+}
+.retro-prize:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 8px 8px 0 #020508 !important;
+}
+
+.retro-prize--cyan {
+  border-color: var(--retro-cyan-dim) !important;
+}
+.retro-prize--cyan:hover {
+  border-color: var(--retro-electric) !important;
+  box-shadow: 8px 8px 0 #0a0604 !important;
+}
+
+.retro-prize--gold {
+  border-color: var(--retro-gold-dim) !important;
+}
+.retro-prize--gold:hover {
+  border-color: var(--retro-gold) !important;
+  box-shadow: 8px 8px 0 #0a0604 !important;
+}
+
+.retro-prize--sky {
+  border-color: #4a3020 !important;
+}
+.retro-prize--sky:hover {
+  border-color: var(--retro-cyan) !important;
+}
+
+/* ─── Flip cards — arcade cabinet bezels ─── */
+#category-cards .flip-face {
+  border-radius: 0 !important;
+  border-width: 3px !important;
+  box-shadow: var(--pixel-shadow);
+}
+
+#category-cards .flip-front {
+  background: linear-gradient(160deg, var(--retro-panel2) 0%, var(--retro-panel) 100%) !important;
+}
+
+#category-cards .flip-back {
+  background: linear-gradient(165deg, #1a100c 0%, #0c0806 100%) !important;
+}
+
+.flip-root:focus-visible {
+  outline: 3px solid var(--retro-gold);
+  outline-offset: 4px;
+  border-radius: 0 !important;
+}
+
+/* ─── Judging — HP-style bars ─── */
+.retro-judge-row {
+  border: 3px solid var(--retro-border) !important;
+  border-radius: 0 !important;
+  background: var(--retro-panel) !important;
+  box-shadow: var(--pixel-shadow);
+}
+
+.judge-meter {
+  height: 10px !important;
+  border: 2px solid #0a0604;
+  border-radius: 0 !important;
+  background: #0e0806 !important;
+  box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.judge-fill {
+  border-radius: 0 !important;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--retro-electric) 0px,
+    var(--retro-electric) 5px,
+    var(--retro-gold) 5px,
+    var(--retro-gold) 10px
+  ) !important;
+  box-shadow: none;
+}
+
+.retro-bonus-box {
+  border: 3px dashed var(--retro-gold) !important;
+  border-radius: 0 !important;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.07) 0%, rgba(18, 10, 6, 0.92) 100%) !important;
+  box-shadow: var(--pixel-shadow);
+}
+
+.retro-bonus-badge {
+  border: 3px solid var(--retro-gold) !important;
+  border-radius: 0 !important;
+  background: #0e0806 !important;
+  color: var(--retro-gold) !important;
+  box-shadow: var(--pixel-shadow);
+  font-family: 'VT323', monospace !important;
+}
+
+/* Register CTA — final stage */
+.retro-final-stage {
+  border: 3px solid var(--retro-electric) !important;
+  border-radius: 0 !important;
+  background: linear-gradient(145deg, rgba(26, 16, 10, 0.98) 0%, #0e0806 100%) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 215, 0, 0.08),
+    var(--pixel-shadow-deep);
+}
+
+/* Footer — credits roll */
+.retro-footer {
+  border-top: 4px solid var(--retro-border);
+  background: #0c0806;
+  font-family: 'VT323', monospace;
+  font-size: 1.1rem;
+}
+
+.retro-footer a {
+  color: var(--retro-text-dim);
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-underline-offset: 4px;
+}
+.retro-footer a:hover {
+  color: var(--retro-electric);
+}
+
+/* Hero reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: reveal-up 0.7s steps(6, end) forwards;
+}
+
+.reveal:nth-child(1) {
+  animation-delay: 0s;
+}
+.reveal:nth-child(2) {
+  animation-delay: 0.06s;
+}
+.reveal:nth-child(3) {
+  animation-delay: 0.1s;
+}
+.reveal:nth-child(4) {
+  animation-delay: 0.14s;
+}
+.reveal:nth-child(5) {
+  animation-delay: 0.18s;
+}
+.reveal:nth-child(6) {
+  animation-delay: 0.22s;
+}
+
+@keyframes reveal-up {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Section fade-in */
+.section-fade .section-fade-item {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.55s ease-out,
+    transform 0.55s ease-out;
+}
+
+.section-fade.is-visible .section-fade-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.section-fade.is-visible .section-fade-item:nth-child(1) {
+  transition-delay: 0s;
+}
+.section-fade.is-visible .section-fade-item:nth-child(2) {
+  transition-delay: 0.07s;
+}
+.section-fade.is-visible .section-fade-item:nth-child(3) {
+  transition-delay: 0.14s;
+}
+.section-fade.is-visible .section-fade-item:nth-child(4) {
+  transition-delay: 0.21s;
+}
+.section-fade.is-visible .section-fade-item:nth-child(5) {
+  transition-delay: 0.28s;
+}
+.section-fade.is-visible .section-fade-item:nth-child(6) {
+  transition-delay: 0.35s;
+}
+.section-fade.is-visible .section-fade-item:nth-child(7) {
+  transition-delay: 0.42s;
+}
+.section-fade.is-visible .section-fade-item:nth-child(8) {
+  transition-delay: 0.49s;
+}
+
+/* Judging meter fill animation */
+.judge-fill {
+  width: 0;
+  transition: width 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.judge-row.is-visible .judge-fill {
+  width: 100%;
+}
+
+/* Timeline last line hide */
+.timeline-item:last-child .timeline-line {
+  display: none;
+}
+
+/* 3D flip cards */
+.flip-root {
+  position: relative;
+  z-index: 1;
+  perspective: 1200px;
+  cursor: pointer;
+}
+
+.flip-root:hover,
+.flip-root.is-flipped,
+.flip-root:focus-within {
+  z-index: 40;
+}
+
+.flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+
+.flip-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
+
+.flip-back {
+  transform: rotateY(180deg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .flip-root:hover .flip-inner {
+    transform: rotateY(180deg);
+  }
+
+  .flip-root.is-flipped .flip-inner {
+    transform: rotateY(180deg);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .flip-root.is-flipped .flip-inner {
+    transform: rotateY(180deg);
+  }
+}
+
+#category-cards {
+  position: relative;
+  z-index: 0;
+}
+
+/* Canvas — chocolate void; animation paints the rest */
+#bg-canvas {
+  background: #120a07;
+}
