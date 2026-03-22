@@ -6,7 +6,7 @@ Official website for the **2nd Annual CHIPS Innovation Challenge**, hosted by th
 
 ## 🌐 Live Site
 
-> [your-project-name.vercel.app](https://your-project-name.vercel.app)
+> [chipshackathon.vercel.app/](https://chipshackathon.vercel.app/)
 
 ---
 
@@ -71,7 +71,7 @@ No installation required. Simply open `index.html` in your browser:
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-username/chips-hackathon.git
+git clone https://github.com/chips-lab/CHIPSHackathon.git
 
 # Navigate into the folder
 cd chips-hackathon
